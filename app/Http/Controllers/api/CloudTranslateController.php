@@ -8,68 +8,68 @@ use Google\Cloud\Translate\V2\TranslateClient;
 
 class CloudTranslateController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-        $translate = new TranslateClient([
+    static $translate;
+    public function __construct() {
+        CloudTranslateController::$translate = new TranslateClient([
             'suppressKeyFileNotice' => true,
             'key' => env('GOOGLE_CLOUD_TRANSLATE_API_KEY')
         ]);
-        $languages = $translate->localizedLanguages([
-            'target' => 'vi'
+    }
+
+    /**
+     * Get list of supported languages
+     *
+     * GET /api/cloud-translate/list-language?target=vi
+     *
+     * @param Request $request get target language
+     * @return array
+     **/
+    public function listLanguage(Request $request)
+    {
+        $target = $request->query('target');
+        $option = [];
+        if ($target) {
+            $option['target'] = $target;
+        }
+        
+        return CloudTranslateController::$translate->localizedLanguages($option);
+    }
+
+    /**
+     * Translate text
+     *
+     * POST /api/cloud-translate/translate
+     *
+     * @param Request $request get source text and target language
+     * @return array
+     **/
+    public function translate(Request $request)
+    {
+        $source = $request->input('source');
+        $target = $request->input('target');
+
+        $result = CloudTranslateController::$translate->translate($source, [
+            'target' => $target
         ]);
-        return $languages;
+
+        return $result;
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+     * Detect language
+     *
+     * POST /api/cloud-translate/detect-language
+     *
+     * @param Request $request Description
+     * @return array
+     **/
+    public function detectLanguage(Request $request)
     {
-        //
-        return 'create';
-    }
+        $source = $request->input('source');
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        $result = CloudTranslateController::$translate->detectLanguage($source);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
+        return $result;
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
+    
 }

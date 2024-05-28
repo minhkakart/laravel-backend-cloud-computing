@@ -7,7 +7,10 @@
     "require": {
         "php": "^8.2",
         "google/cloud-translate": "^1.17",
+        "google/cloud-videointelligence": "^1.15",
+        "google/cloud-vision": "^1.9",
         "laravel/framework": "^11.0",
+        "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9"
     },
     "require-dev": {
