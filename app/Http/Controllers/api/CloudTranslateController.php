@@ -3,13 +3,16 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Activity;
 use Illuminate\Http\Request;
 use Google\Cloud\Translate\V2\TranslateClient;
+use Illuminate\Support\Facades\Auth;
 
 class CloudTranslateController extends Controller
 {
     static $translate;
-    public function __construct() {
+    public function __construct()
+    {
         CloudTranslateController::$translate = new TranslateClient([
             'suppressKeyFileNotice' => true,
             'key' => env('GOOGLE_CLOUD_TRANSLATE_API_KEY')
@@ -31,7 +34,7 @@ class CloudTranslateController extends Controller
         if ($target) {
             $option['target'] = $target;
         }
-        
+
         return CloudTranslateController::$translate->localizedLanguages($option);
     }
 
@@ -52,6 +55,15 @@ class CloudTranslateController extends Controller
             'target' => $target
         ]);
 
+        $user_id = Auth::id();
+        $user_activities = Activity::firstOrNew([
+            'user_id' => $user_id,
+            'api' => 'cloud-translate'
+        ], [
+            'count' => 0
+        ]);
+        $user_activities->increment('count');
+        $user_activities->save();
         return $result;
     }
 
@@ -69,7 +81,17 @@ class CloudTranslateController extends Controller
 
         $result = CloudTranslateController::$translate->detectLanguage($source);
 
+        $user_id = Auth::id();
+        $user_activities = Activity::firstOrNew([
+            'user_id' => $user_id,
+            'api' => 'detect-language'
+        ], [
+            'count' => 0
+        ]);
+        $user_activities->increment('count');
+        $user_activities->save();
+
         return $result;
     }
-    
+
 }

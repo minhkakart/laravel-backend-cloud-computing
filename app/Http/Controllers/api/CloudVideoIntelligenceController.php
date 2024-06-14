@@ -67,8 +67,6 @@ class CloudVideoIntelligenceController extends Controller
         } else {
             $error = $operationResponse->getError();
             return response()->json($error);
-            // echo "error: " . $error->getMessage() . PHP_EOL;
-
         }
     }
 }

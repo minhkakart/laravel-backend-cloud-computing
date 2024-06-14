@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Laravel\Sanctum\PersonalAccessToken as SanctumPersonalAccessToken;
+use Laravel\Sanctum\Sanctum;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,5 +22,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         //
+        Sanctum::usePersonalAccessTokenModel(SanctumPersonalAccessToken::class);
     }
 }

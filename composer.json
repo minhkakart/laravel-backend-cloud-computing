@@ -6,10 +6,12 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "google/cloud-storage": "^1.42",
         "google/cloud-translate": "^1.17",
         "google/cloud-videointelligence": "^1.15",
         "google/cloud-vision": "^1.9",
         "laravel/framework": "^11.0",
+        "laravel/reverb": "@beta",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9"
     },
