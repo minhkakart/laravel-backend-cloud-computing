@@ -15,7 +15,7 @@ use App\Http\Controllers\api\CloudTranslateController;
 
 
 Route::get('email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-    $user = User::find($request->route('id'));
+    $user = Auth::guard('sanctum')->getProvider()->retrieveById($request->route('id'));
     if (!$user) {
         return response()->json([
             'message' => 'User not found'
