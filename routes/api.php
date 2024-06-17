@@ -48,7 +48,7 @@ Route::get('email/verify/{id}/{hash}', function (EmailVerificationRequest $reque
     }
 
     $user->markEmailAsVerified();
-    event(new Verified($user));
+    // event(new Verified($user));
 
     // $request->fulfill();
 
