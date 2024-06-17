@@ -3,6 +3,7 @@
 use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\CloudVideoIntelligenceController;
 use App\Http\Controllers\api\UploadController;
+use App\Mail\TestMail;
 use Google\Cloud\VideoIntelligence\V1\Feature;
 use Google\Cloud\VideoIntelligence\V1\VideoIntelligenceServiceClient;
 use Illuminate\Http\Request;
@@ -108,4 +109,10 @@ Route::post('test_face', function (Request $request){
         $error = $operationResponse->getError();
         return response()->json($error)->setStatusCode(500);
     }
+});
+
+Route::get('test_mail', function (Request $request) {
+    $to = $request->input('to_email');
+    $result = Mail::to($to)->send(new TestMail());
+    return response()->json($result);
 });
