@@ -8,7 +8,6 @@ use App\Models\User;
 use Google\Cloud\VideoIntelligence\V1\Feature;
 use Google\Cloud\VideoIntelligence\V1\VideoIntelligenceServiceClient;
 use Illuminate\Auth\Events\Verified;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\CloudTranslateController;
@@ -31,7 +30,7 @@ Route::get('email/verify/{id}/{hash}', function (Request $request) {
     $signature = $request->query('signature');
     if (!hash_equals($signature, hash_hmac('sha256', $request->fullUrl(), env('APP_KEY')))) {
         return response()->json([
-            'message' => 'Invalid verification link'
+            'message' => 'Invalid signature'
         ])->setStatusCode(400);
     }
 
