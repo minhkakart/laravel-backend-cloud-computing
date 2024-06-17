@@ -6,26 +6,27 @@ use App\Http\Controllers\api\UploadController;
 use App\Mail\TestMail;
 use Google\Cloud\VideoIntelligence\V1\Feature;
 use Google\Cloud\VideoIntelligence\V1\VideoIntelligenceServiceClient;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\CloudTranslateController;
 
 
-// Route::get('email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-//     $request->fulfill();
+Route::get('email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
 
-//     return response()->json([
-//         'message' => 'Email verified'
-//     ]);
-// })->middleware(['auth:sanctum', 'signed'])->name('verification.verify');
+    return response()->json([
+        'message' => 'Email verified'
+    ]);
+})->middleware(['auth:sanctum', 'signed'])->name('verification.verify');
 
-// Route::post('email/verification-notification', function (Request $request) {
-//     $request->user()->sendEmailVerificationNotification();
+Route::post('email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
 
-//     return response()->json([
-//         'message' => 'Email verification link sent'
-//     ]);
-// })->middleware(['auth:sanctum', 'throttle:6,1'])->name('verification.send');
+    return response()->json([
+        'message' => 'Email verification link sent'
+    ]);
+})->middleware(['auth:sanctum', 'throttle:6,1'])->name('verification.send');
 Route::get('csrf-cookie', function () {
     return response()->json([
         'message' => 'CSRF cookie set successfully'
@@ -113,6 +114,8 @@ Route::post('test_face', function (Request $request){
 
 Route::get('test_mail', function (Request $request) {
     $to = $request->input('to_email');
-    $result = Mail::to($to)->send(new TestMail());
-    return response()->json($result);
+    Mail::to($to)->send(new TestMail());
+    return response()->json([
+        'message' => 'Mail sent successfully'
+    ]);
 });

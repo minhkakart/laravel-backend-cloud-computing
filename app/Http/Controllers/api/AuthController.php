@@ -4,7 +4,7 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-// use Illuminate\Auth\Events\Registered;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -16,7 +16,7 @@ class AuthController extends Controller
             'email' => 'required|email|unique:users',
             'password' => 'required|string|min:6'
         ]);
-        User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password)
@@ -26,7 +26,7 @@ class AuthController extends Controller
         //     'access_token' => $token,
         //     'token_type' => 'Bearer'
         // ]);
-        // event(new Registered($user));
+        event(new Registered($user));
         return response()->json([
             'message' => 'User registered successfully'
         ]);
