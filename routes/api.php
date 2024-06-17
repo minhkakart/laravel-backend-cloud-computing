@@ -22,6 +22,9 @@ Route::get('email/verify/{id}/{hash}', function (EmailVerificationRequest $reque
         ])->setStatusCode(404);
     }
 
+    Auth::loginUsingId($user->id);
+    $user = Auth::user();
+
     $expires = $request->query('expires');
     if ($expires && strtotime($expires) < time()) {
         return response()->json([
