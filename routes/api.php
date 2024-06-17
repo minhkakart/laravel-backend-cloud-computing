@@ -27,8 +27,8 @@ Route::get('email/verify/{id}/{hash}', function (Request $request) {
             'message' => 'The verification link has expired'
         ])->setStatusCode(400);
     }
-    $signature = $request->query('signature');
-    if (!hash_equals(hash_hmac('sha256', $request->fullUrl(), env('APP_KEY')), $signature)) {
+    
+    if (!$request->hasValidSignature()) {
         return response()->json([
             'message' => 'Invalid signature'
         ])->setStatusCode(400);
