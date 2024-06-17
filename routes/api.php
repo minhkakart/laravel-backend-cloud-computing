@@ -28,13 +28,13 @@ Route::get('email/verify/{id}/{hash}', function (Request $request) {
         ])->setStatusCode(400);
     }
     $signature = $request->query('signature');
-    if (!hash_equals($signature, hash_hmac('sha256', $request->fullUrl(), env('APP_KEY')))) {
+    if (!hash_equals(hash_hmac('sha256', $request->fullUrl(), env('APP_KEY')), $signature)) {
         return response()->json([
             'message' => 'Invalid signature'
         ])->setStatusCode(400);
     }
 
-    if (!hash_equals((string) $request->route('hash'), sha1($user->getEmailForVerification()))) {
+    if (!hash_equals(sha1($user->getEmailForVerification()), (string) $request->route('hash'))) {
         return response()->json([
             'message' => 'Invalid verification link'
         ])->setStatusCode(400);
