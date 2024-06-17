@@ -45,7 +45,10 @@ Route::prefix('cloud-translate')->group(function () {
     Route::get('list-language', [CloudTranslateController::class, 'listLanguage'])->middleware('auth:sanctum');
     Route::post('translate', [CloudTranslateController::class, 'translate'])->middleware('auth:sanctum');
     Route::post('detect-language', [CloudTranslateController::class, 'detectLanguage'])->middleware('auth:sanctum');
+});
+Route::prefix('video-intelligence')->group(function () {
     Route::post('detect-labels', [CloudVideoIntelligenceController::class, 'labelDetection'])->middleware('auth:sanctum');
+    Route::post('detect-face', [CloudVideoIntelligenceController::class, 'faceDetection'])->middleware('auth:sanctum');
 });
 
 Route::post('upload_file', [UploadController::class, 'upload_file'])->middleware('auth:sanctum');
