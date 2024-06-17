@@ -14,8 +14,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\CloudTranslateController;
 
 
-Route::get('email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-    $user = Auth::guard('sanctum')->getProvider()->retrieveById($request->route('id'));
+Route::get('email/verify/{id}/{hash}', function (Request $request) {
+    $user = User::find($request->route('id'));
     if (!$user) {
         return response()->json([
             'message' => 'User not found'
@@ -48,7 +48,7 @@ Route::get('email/verify/{id}/{hash}', function (EmailVerificationRequest $reque
     }
 
     $user->markEmailAsVerified();
-    // event(new Verified($user));
+    event(new Verified($user));
 
     // $request->fulfill();
 
