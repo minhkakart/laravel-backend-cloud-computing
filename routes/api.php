@@ -22,9 +22,6 @@ Route::get('email/verify/{id}/{hash}', function (EmailVerificationRequest $reque
         ])->setStatusCode(404);
     }
 
-    Auth::loginUsingId($user->id);
-    $user = Auth::user();
-
     $expires = $request->query('expires');
     if ($expires && strtotime($expires) < time()) {
         return response()->json([
@@ -58,7 +55,7 @@ Route::get('email/verify/{id}/{hash}', function (EmailVerificationRequest $reque
     return response()->json([
         'message' => 'Email verified'
     ]);
-})->name('verification.verify');
+})->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
 
 Route::post('email/verification-notification', function (Request $request) {
     $request->user()->sendEmailVerificationNotification();
