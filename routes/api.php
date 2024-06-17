@@ -4,8 +4,10 @@ use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\CloudVideoIntelligenceController;
 use App\Http\Controllers\api\UploadController;
 use App\Mail\TestMail;
+use App\Models\User;
 use Google\Cloud\VideoIntelligence\V1\Feature;
 use Google\Cloud\VideoIntelligence\V1\VideoIntelligenceServiceClient;
+use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -13,12 +15,47 @@ use App\Http\Controllers\api\CloudTranslateController;
 
 
 Route::get('email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-    $request->fulfill();
+    $user = User::find($request->route('id'));
+    if (!$user) {
+        return response()->json([
+            'message' => 'User not found'
+        ])->setStatusCode(404);
+    }
+
+    $expires = $request->query('expires');
+    if ($expires && strtotime($expires) < time()) {
+        return response()->json([
+            'message' => 'The verification link has expired'
+        ])->setStatusCode(400);
+    }
+    $signature = $request->query('signature');
+    if (!hash_equals($signature, hash_hmac('sha256', $request->fullUrl(), env('APP_KEY')))) {
+        return response()->json([
+            'message' => 'Invalid verification link'
+        ])->setStatusCode(400);
+    }
+
+    if (!hash_equals((string) $request->route('hash'), sha1($user->getEmailForVerification()))) {
+        return response()->json([
+            'message' => 'Invalid verification link'
+        ])->setStatusCode(400);
+    }
+
+    if ($user->hasVerifiedEmail()) {
+        return response()->json([
+            'message' => 'Email already verified'
+        ]);
+    }
+
+    $user->markEmailAsVerified();
+    event(new Verified($user));
+
+    // $request->fulfill();
 
     return response()->json([
         'message' => 'Email verified'
     ]);
-})->middleware(['auth', 'signed'])->name('verification.verify');
+})->name('verification.verify');
 
 Route::post('email/verification-notification', function (Request $request) {
     $request->user()->sendEmailVerificationNotification();
