@@ -22,7 +22,7 @@ Route::get('email/verify/{id}/{hash}', function (Request $request) {
     }
 
     $expires = $request->query('expires');
-    if ($expires && strtotime($expires * 1000) < time()) {
+    if ($expires && ($expires < time())) {
         return response()->json([
             'message' => 'The verification link has expired'
         ])->setStatusCode(400);
