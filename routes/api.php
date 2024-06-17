@@ -3,6 +3,8 @@
 use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\CloudVideoIntelligenceController;
 use App\Http\Controllers\api\UploadController;
+use Google\Cloud\VideoIntelligence\V1\Feature;
+use Google\Cloud\VideoIntelligence\V1\VideoIntelligenceServiceClient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\CloudTranslateController;
@@ -52,3 +54,58 @@ Route::prefix('video-intelligence')->group(function () {
 });
 
 Route::post('upload_file', [UploadController::class, 'upload_file'])->middleware('auth:sanctum');
+
+Route::post('test_face', function (Request $request){
+    $videoIntelligenceServiceClient = new VideoIntelligenceServiceClient([
+        'suppressKeyFileNotice' => true,
+        'key' => env('GOOGLE_CLOUD_TRANSLATE_API_KEY')
+    ]);
+
+    $inputUri = 'gs://video-ai-example-1/WIN_20240515_19_42_50_Pro.mp4';
+    // $inputUri = $request->input('gcs_uri');
+
+    $features = [
+        Feature::FACE_DETECTION,
+    ];
+    $operationResponse = $videoIntelligenceServiceClient->annotateVideo([
+        'inputUri' => $inputUri,
+        'features' => $features
+    ]);
+    $operationResponse->pollUntilComplete();
+    if ($operationResponse->operationSucceeded()) {
+        $results = $operationResponse->getResult();
+        // dd($results);
+        $anotationResults = [];
+        foreach ($results->getAnnotationResults() as $result) {
+            // echo 'Segment labels' . PHP_EOL;
+            $face_detection_annotations = [];
+            foreach ($result->getFaceDetectionAnnotations() as $faceDetectionAnnotation) {
+                $tracks = [];
+                foreach ($faceDetectionAnnotation->getTracks() as $track) {
+                    $tracks[] = [
+                        'segment' => [
+                            'start_time_offset' => $track->getSegment()->getStartTimeOffset()->getSeconds() + $track->getSegment()->getStartTimeOffset()->getNanos() / 1000000000,
+                            'end_time_offset' => $track->getSegment()->getEndTimeOffset()->getSeconds() + $track->getSegment()->getEndTimeOffset()->getNanos() / 1000000000,
+                        ],
+                        'confidence' => $track->getConfidence(),
+                    ];
+                }
+                $thumbnail = $faceDetectionAnnotation->getThumbnail();
+                $thumbnail = base64_encode($thumbnail);
+                $face_detection_annotations[] = [
+                    'tracks' => $tracks,
+                    'thumbnail' => $thumbnail
+                ];
+            }
+
+            $anotationResults[] = [
+                'face_detection_annotations' => $face_detection_annotations
+            ];
+        }
+        $respone = ['anotation_results' => $anotationResults];
+        return response()->json($respone);
+    } else {
+        $error = $operationResponse->getError();
+        return response()->json($error)->setStatusCode(500);
+    }
+});
