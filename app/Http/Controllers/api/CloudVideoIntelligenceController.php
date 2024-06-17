@@ -14,7 +14,10 @@ class CloudVideoIntelligenceController extends Controller
 
     public function labelDetection(Request $request)
     {
-        $videoIntelligenceServiceClient = new VideoIntelligenceServiceClient();
+        $videoIntelligenceServiceClient = new VideoIntelligenceServiceClient([
+            'suppressKeyFileNotice' => true,
+            'key' => env('GOOGLE_CLOUD_TRANSLATE_API_KEY')
+        ]);
 
         // $inputUri = "gs://video-ai-example-1/2023-12-23 16-56-28.mkv";
         $inputUri = $request->input('gcs_uri');
@@ -80,7 +83,10 @@ class CloudVideoIntelligenceController extends Controller
 
     public function faceDetection(Request $request)
     {
-        $videoIntelligenceServiceClient = new VideoIntelligenceServiceClient();
+        $videoIntelligenceServiceClient = new VideoIntelligenceServiceClient([
+            'suppressKeyFileNotice' => true,
+            'key' => env('GOOGLE_CLOUD_TRANSLATE_API_KEY')
+        ]);
 
         // $inputUri = 'gs://video-ai-example-1/WIN_20240515_19_42_50_Pro.mp4';
         $inputUri = $request->input('gcs_uri');
