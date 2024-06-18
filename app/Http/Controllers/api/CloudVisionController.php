@@ -32,4 +32,24 @@ class CloudVisionController extends Controller
 
         return response()->json(['descriptions' => $result]);
     }
+
+    public function textDetection(Request $request)
+    {
+        $image_url = $request->input('gcs_uri');
+        $client = new ImageAnnotatorClient();
+
+        // Đọc nội dung của hình ảnh, nhận diện chữ.
+        // $image = file_get_contents('/xampp/htdocs/bai1/mu.png');
+        $response = $client->textDetection($image_url);
+
+        // Hiển thị kết quả nhận diện chữ.
+        $annotations = $response->getTextAnnotations();
+        $result = [];
+        foreach ($annotations as $annotation) {
+            $result[] = $annotation->getDescription();
+        }
+
+        $client->close();
+        return response()->json(['textdetect' => $result]);
+    }
 }
