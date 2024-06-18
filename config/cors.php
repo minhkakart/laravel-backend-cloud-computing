@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    'allowed_origins' => ['.group11tlu.uk', 'localhost'],
 
     'allowed_origins_patterns' => [],
 
