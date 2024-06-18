@@ -49,8 +49,9 @@ class TextToSpeechController extends Controller
             $user_activities->save();
             $user_activities->increment('count');
 
+        $array = str_split(base64_encode($audioContent), 100);
         return response()->json([
-            'audioContent' => base64_encode($audioContent),
+            'audioContent' => $array
         ]);
     }
 }
