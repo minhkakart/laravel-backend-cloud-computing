@@ -12,7 +12,8 @@ use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\CloudTranslateController;
-use App\Http\Controllers\api\CloudVisionController;
+use App\Http\Controllers\api\DetectExplicitContentController;
+use App\Http\Controllers\api\TextToSpeechController;
 
 Route::get('email/verify/{id}/{hash}', function (Request $request) {
     $user = User::find($request->route('id'));
@@ -149,6 +150,7 @@ Route::post('test_face', function (Request $request){
     }
 });
 
+
 Route::get('test_mail', function (Request $request) {
     $to = $request->input('to_email');
     Mail::to($to)->send(new TestMail());
@@ -156,7 +158,5 @@ Route::get('test_mail', function (Request $request) {
         'message' => 'Mail sent successfully'
     ]);
 });
-
-Route::post('/cloud-vision/landmark', [CloudVisionController::class, 'landmarkDetection']);
-
-Route::post('/cloud-vision/text-detection', [CloudVisionController::class, 'textDetection']);
+Route::get('test-detect-content', [DetectExplicitContentController::class, 'detectExplicitContent']);
+Route::post('test-text-to-speech', [TextToSpeechController::class, 'synthesize_text']);
