@@ -41,7 +41,7 @@ class CloudVisionController extends Controller
         // Đọc nội dung của hình ảnh, nhận diện chữ.
         // $image = file_get_contents('/xampp/htdocs/bai1/mu.png');
         $response = $client->textDetection($image_url);
-
+        
         // Hiển thị kết quả nhận diện chữ.
         $annotations = $response->getTextAnnotations();
         $result = [];
