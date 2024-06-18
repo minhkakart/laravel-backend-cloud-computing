@@ -158,5 +158,5 @@ Route::get('test_mail', function (Request $request) {
         'message' => 'Mail sent successfully'
     ]);
 });
-Route::get('test-detect-content', [DetectExplicitContentController::class, 'detectExplicitContent']);
+Route::post('detect-explicit-content', [DetectExplicitContentController::class, 'detectExplicitContent']);
 Route::post('text-to-speech', [TextToSpeechController::class, 'synthesize_text'])->middleware('auth:sanctum');
