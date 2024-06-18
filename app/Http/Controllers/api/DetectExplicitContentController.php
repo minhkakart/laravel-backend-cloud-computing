@@ -12,9 +12,9 @@ class DetectExplicitContentController extends Controller
     //
     public function detectExplicitContent(Request $request)
     {
-        // $video = $request->file('video');
-        // if ($video) {
-            if (true) {
+        $gcs_uri = $request->file('gcs_uri');
+        if ($gcs_uri) {
+            // if (true) {
             // Lưu tệp video vào storage
             // $videoPath = $video->store('videos', 'public');
 
@@ -30,7 +30,7 @@ class DetectExplicitContentController extends Controller
             $features = [Feature::EXPLICIT_CONTENT_DETECTION];
             $operationResponse = $videoIntelligenceServiceClient->annotateVideo([
                 // 'inputUri' => 'gs://your-bucket/' . $videoPath, // Thay thế your-bucket bằng tên bucket của bạn
-                'inputUri' => 'gs://video-ai-example-1/Genshin_Impact_2023-11-17_23-05-47.1718551286.mp4',
+                'inputUri' => $gcs_uri,
                 'features' => $features
             ]);
 
