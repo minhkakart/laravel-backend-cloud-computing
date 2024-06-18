@@ -155,3 +155,5 @@ Route::get('test_mail', function (Request $request) {
         'message' => 'Mail sent successfully'
     ]);
 });
+
+Route::post('/cloud-vision/landmark', [CloudVisionController::class, 'landmarkDetection']);
