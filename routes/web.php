@@ -4,7 +4,7 @@ use App\Http\Controllers\TestApiController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return phpinfo();
+    return view('welcome');
 });
 
 Route::get('test', [TestApiController::class, 'test']);
