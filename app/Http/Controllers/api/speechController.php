@@ -16,14 +16,15 @@ class speechController extends Controller
 
         $speechClient = new SpeechClient();
         //dịch 1 đoạn nhạc thành text
-        $audioFile = '/xampp/htdocs/bai1/happy.mp3';
 
         // Khởi tạo SpeechClient
 
         // Đọc dữ liệu từ file audio
 
+        // $audio = (new RecognitionAudio())
+        //     ->setContent(file_get_contents($audioFile));
         $audio = (new RecognitionAudio())
-            ->setContent(file_get_contents($audioFile));
+            ->setUri($audioFile);
 
         // Thiết lập các thông số cho quá trình nhận dạng
         $config = (new RecognitionConfig())
@@ -33,7 +34,7 @@ class speechController extends Controller
 
         // Gửi yêu cầu nhận dạng
         $response = $speechClient->recognize($config, $audio);
-        $results =[];
+        $results = [];
         $ketqua = [];
         // dd($response);
         // Lặp qua các kết quả nhận dạng
@@ -42,9 +43,8 @@ class speechController extends Controller
             // $results[] = $result->getAlternatives()[0]->getTranscript();
             $results = $result->getAlternatives();
 
-            foreach($results as $re){
+            foreach ($results as $re) {
                 $ketqua[] = $re->getTranscript();
-
             }
             // echo 'Text: ' . $transcript . PHP_EOL;
         }
