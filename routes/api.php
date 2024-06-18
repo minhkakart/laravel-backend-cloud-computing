@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\CloudTranslateController;
 use App\Http\Controllers\api\CloudVisionController;
+use App\Http\Controllers\api\speechController;
 
 Route::get('email/verify/{id}/{hash}', function (Request $request) {
     $user = User::find($request->route('id'));
@@ -159,3 +160,4 @@ Route::get('test_mail', function (Request $request) {
 Route::post('/cloud-vision/landmark', [CloudVisionController::class, 'landmarkDetection']);
 
 Route::post('/cloud-vision/text-detection', [CloudVisionController::class, 'textDetection']);
+Route::post('/cloud-vision/speech-detection', [speechController::class, 'speechAi']);
