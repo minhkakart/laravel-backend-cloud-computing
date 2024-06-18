@@ -160,3 +160,11 @@ Route::get('test_mail', function (Request $request) {
 });
 Route::get('test-detect-content', [DetectExplicitContentController::class, 'detectExplicitContent']);
 Route::post('test-text-to-speech', [TextToSpeechController::class, 'synthesize_text']);
+Route::prefix('cloud-vision')->group(function (){
+    Route::post('face-detection', [CloudVisionController::class, 'faceDetection']);
+    Route::post('label-detection', [CloudVisionController::class, 'labelDetection']);
+    Route::post('safe-search-detection', [CloudVisionController::class, 'safeSearchDetection']);
+    Route::post('logo-detection', [CloudVisionController::class, 'logoDetection']);
+    Route::post('image-property-detection', [CloudVisionController::class, 'imagePropertyDetection']);
+    
+});
