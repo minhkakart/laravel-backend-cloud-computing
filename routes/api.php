@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\CloudVideoIntelligenceController;
+use App\Http\Controllers\api\CloudVisionController;
 use App\Http\Controllers\api\UploadController;
 use App\Mail\TestMail;
 use App\Models\User;
