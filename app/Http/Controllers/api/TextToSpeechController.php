@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Activity;
 use Illuminate\Http\Request;
 use Google\Cloud\TextToSpeech\V1\AudioConfig;
 use Google\Cloud\TextToSpeech\V1\AudioEncoding;
@@ -10,52 +11,46 @@ use Google\Cloud\TextToSpeech\V1\SsmlVoiceGender;
 use Google\Cloud\TextToSpeech\V1\SynthesisInput;
 use Google\Cloud\TextToSpeech\V1\TextToSpeechClient;
 use Google\Cloud\TextToSpeech\V1\VoiceSelectionParams;
-use Illuminate\Http\Testing\FileFactory;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class TextToSpeechController extends Controller
 {
-    //
-    // public function upload(Request $request)
-    // {
-    //     $request->validate([
-    //         'file' => 'required|file|mimes:txt|max:2048',
-    //     ]);
-
-    //     $file = $request->file('file');
-    //     $text = file_get_contents($file->getRealPath());
-
-    //     $outputFilePath = public_path('output.mp3');
-    //     $this->synthesize_text($text, $outputFilePath);
-
-    //     return view('TextToSpeech.textToSpeech', ['audioFile' => 'output.mp3']);
-    // }
-
     public function synthesize_text(Request $request)
     {
         $client = new TextToSpeechClient();
-        // $text = $request->input('text');
-        $text = "Xin chào, đây là nhóm mười một";
+        if ($request->has('text')) {
+            $text = $request->text;
+        } else {
+            return response()->json([
+                'message' => 'Text is required'
+            ])->setStatusCode(400);
+        }
 
         $input_text = (new SynthesisInput())->setText($text);
 
         $voice = (new VoiceSelectionParams())
-            ->setLanguageCode('en-US')
+            ->setLanguageCode('vi-VN')
             ->setSsmlGender(SsmlVoiceGender::FEMALE);
 
         $audioConfig = (new AudioConfig())
-            ->setAudioEncoding(AudioEncoding::MP3);
+            ->setAudioEncoding(AudioEncoding::LINEAR16);
 
         $response = $client->synthesizeSpeech($input_text, $voice, $audioConfig);
         $audioContent = $response->getAudioContent();
-        $file_path = public_path('text' . time() . '.mp3');
-        // Storage::put($file_path, $audioContent);
-
-        file_put_contents($file_path, $audioContent);
-
-
         $client->close();
 
-        return response()->file($file_path);
+        $user_id = Auth::id();
+            $user_activities = Activity::firstOrNew([
+                'user_id' => $user_id,
+                'api' => 'text_to_speech'
+            ], [
+                'count' => 0
+            ]);
+            $user_activities->save();
+            $user_activities->increment('count');
+
+        return response()->json([
+            'audioContent' => base64_encode($audioContent),
+        ]);
     }
 }

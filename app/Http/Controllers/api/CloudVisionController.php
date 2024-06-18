@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use Google\Cloud\Vision\V1\ImageAnnotatorClient;
+use Google\Cloud\Vision\V1\Likelihood;
 use Illuminate\Http\Request;
 
 class CloudVisionController extends Controller
@@ -41,7 +42,7 @@ class CloudVisionController extends Controller
         // Đọc nội dung của hình ảnh, nhận diện chữ.
         // $image = file_get_contents('/xampp/htdocs/bai1/mu.png');
         $response = $client->textDetection($image_url);
-        
+
         // Hiển thị kết quả nhận diện chữ.
         $annotations = $response->getTextAnnotations();
         $result = [];
@@ -52,7 +53,7 @@ class CloudVisionController extends Controller
         $client->close();
         return response()->json(['textdetect' => $result]);
     }
-    ////////////
+
     public function faceDetection(Request $request)
     {
         $image_url = $request->input('gcs_uri');

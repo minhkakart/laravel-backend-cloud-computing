@@ -12,16 +12,9 @@ class DetectExplicitContentController extends Controller
     //
     public function detectExplicitContent(Request $request)
     {
-        // $video = $request->file('video');
-        // if ($video) {
-            if (true) {
-            // Lưu tệp video vào storage
-            // $videoPath = $video->store('videos', 'public');
-
-            // Đường dẫn đầy đủ đến tệp đã lưu
-            // $fullPath = storage_path('app/public/' . $videoPath);
-
-            // Gọi API từ Google Cloud để nhận dạng explicit content
+        $gcs_uri = $request->input('gcs_uri');
+        if ($gcs_uri) {
+            
             $videoIntelligenceServiceClient = new VideoIntelligenceServiceClient(
                 [
                     'key'=>'AIzaSyAEUVhT079TLkIiDe2XmpcoifaIOQvQdLM'
@@ -29,8 +22,7 @@ class DetectExplicitContentController extends Controller
             );
             $features = [Feature::EXPLICIT_CONTENT_DETECTION];
             $operationResponse = $videoIntelligenceServiceClient->annotateVideo([
-                // 'inputUri' => 'gs://your-bucket/' . $videoPath, // Thay thế your-bucket bằng tên bucket của bạn
-                'inputUri' => 'gs://video-ai-example-1/Genshin_Impact_2023-11-17_23-05-47.1718551286.mp4',
+                'inputUri' => $gcs_uri,
                 'features' => $features
             ]);
 
@@ -40,16 +32,13 @@ class DetectExplicitContentController extends Controller
                 // dd($result);
                 $frames = [];
                 foreach ($result->getAnnotationResults()[0]->getExplicitAnnotation()->getFrames() as $frame) {
-
-                    if($likelihood = $frame->getPornographyLikelihood() == 0){
+                    if($frame->getPornographyLikelihood() == 0){
                         $frameTime = $frame->getTimeOffset()->getSeconds() + $frame->getTimeOffset()->getNanos() / 1e9;
                         $frames[] = [
                             'time' => $frameTime,
-                            'pornography' => $likelihood,
+                            'pornography' => 'Video is likely contains pornography or violence',
                         ];
-                    }
-                    // $likelihood = $frame->getPornographyLikelihood();
-                    
+                    }   
                 }
                 return response()->json(['frames' => $frames]);
             } else {

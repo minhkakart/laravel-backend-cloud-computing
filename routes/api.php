@@ -158,8 +158,8 @@ Route::get('test_mail', function (Request $request) {
         'message' => 'Mail sent successfully'
     ]);
 });
-Route::get('test-detect-content', [DetectExplicitContentController::class, 'detectExplicitContent']);
-Route::post('test-text-to-speech', [TextToSpeechController::class, 'synthesize_text']);
+Route::post('detect-explicit-content', [DetectExplicitContentController::class, 'detectExplicitContent']);
+Route::post('text-to-speech', [TextToSpeechController::class, 'synthesize_text'])->middleware('auth:sanctum');
 Route::prefix('cloud-vision')->group(function (){
     Route::post('face-detection', [CloudVisionController::class, 'faceDetection']);
     Route::post('label-detection', [CloudVisionController::class, 'labelDetection']);
