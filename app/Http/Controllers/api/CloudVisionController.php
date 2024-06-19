@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Activity;
 use Google\Cloud\Vision\V1\ImageAnnotatorClient;
 use Google\Cloud\Vision\V1\Likelihood;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CloudVisionController extends Controller
 {
@@ -26,10 +28,20 @@ class CloudVisionController extends Controller
         $result = [];
         foreach ($annotations as $annotation) {
             // echo "Landmark: " . $annotation->getDescription() . PHP_EOL;
-            $result[] =  $annotation->getDescription();
+            $result[] = $annotation->getDescription();
         }
 
         $client->close();
+
+        $user_id = Auth::id();
+        $user_activities = Activity::firstOrNew([
+            'user_id' => $user_id,
+            'api' => 'cloud-vision-landmarkDetection'
+        ], [
+            'count' => 0
+        ]);
+        $user_activities->save();
+        $user_activities->increment('count');
 
         return response()->json(['descriptions' => $result]);
     }
@@ -51,6 +63,17 @@ class CloudVisionController extends Controller
         }
 
         $client->close();
+
+        $user_id = Auth::id();
+        $user_activities = Activity::firstOrNew([
+            'user_id' => $user_id,
+            'api' => 'cloud-vision-textDetection'
+        ], [
+            'count' => 0
+        ]);
+        $user_activities->save();
+        $user_activities->increment('count');
+
         return response()->json(['textdetect' => $result]);
     }
 
@@ -81,6 +104,16 @@ class CloudVisionController extends Controller
 
         $client->close();
 
+        $user_id = Auth::id();
+        $user_activities = Activity::firstOrNew([
+            'user_id' => $user_id,
+            'api' => 'cloud-vision-face-detection'
+        ], [
+            'count' => 0
+        ]);
+        $user_activities->save();
+        $user_activities->increment('count');
+
         return response()->json(['faces' => $faces]);
     }
 
@@ -101,6 +134,16 @@ class CloudVisionController extends Controller
         }
 
         $client->close();
+
+        $user_id = Auth::id();
+        $user_activities = Activity::firstOrNew([
+            'user_id' => $user_id,
+            'api' => 'cloud-vision-labelDetection'
+        ], [
+            'count' => 0
+        ]);
+        $user_activities->save();
+        $user_activities->increment('count');
 
         return response()->json(['labels' => $labels]);
     }
@@ -126,6 +169,16 @@ class CloudVisionController extends Controller
 
         $client->close();
 
+        $user_id = Auth::id();
+        $user_activities = Activity::firstOrNew([
+            'user_id' => $user_id,
+            'api' => 'cloud-vision-safeSearchDetection'
+        ], [
+            'count' => 0
+        ]);
+        $user_activities->save();
+        $user_activities->increment('count');
+
         return response()->json(['safeSearch' => $safeSearch]);
     }
 
@@ -146,6 +199,16 @@ class CloudVisionController extends Controller
         }
 
         $client->close();
+
+        $user_id = Auth::id();
+        $user_activities = Activity::firstOrNew([
+            'user_id' => $user_id,
+            'api' => 'cloud-vision-logoDetection'
+        ], [
+            'count' => 0
+        ]);
+        $user_activities->save();
+        $user_activities->increment('count');
 
         return response()->json(['logos' => $logos]);
     }
@@ -173,6 +236,16 @@ class CloudVisionController extends Controller
         }
 
         $client->close();
+
+        $user_id = Auth::id();
+        $user_activities = Activity::firstOrNew([
+            'user_id' => $user_id,
+            'api' => 'cloud-vision-imagePropertyDetection'
+        ], [
+            'count' => 0
+        ]);
+        $user_activities->save();
+        $user_activities->increment('count');
 
         return response()->json(['properties' => $properties]);
     }

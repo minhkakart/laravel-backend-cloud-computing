@@ -3,6 +3,7 @@
 use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\CloudVideoIntelligenceController;
 use App\Http\Controllers\api\CloudVisionController;
+use App\Http\Controllers\api\speechController;
 use App\Http\Controllers\api\UploadController;
 use App\Mail\TestMail;
 use App\Models\User;
@@ -161,10 +162,15 @@ Route::get('test_mail', function (Request $request) {
 Route::post('detect-explicit-content', [DetectExplicitContentController::class, 'detectExplicitContent']);
 Route::post('text-to-speech', [TextToSpeechController::class, 'synthesize_text'])->middleware('auth:sanctum');
 Route::prefix('cloud-vision')->group(function (){
-    Route::post('face-detection', [CloudVisionController::class, 'faceDetection']);
-    Route::post('label-detection', [CloudVisionController::class, 'labelDetection']);
-    Route::post('safe-search-detection', [CloudVisionController::class, 'safeSearchDetection']);
-    Route::post('logo-detection', [CloudVisionController::class, 'logoDetection']);
-    Route::post('image-property-detection', [CloudVisionController::class, 'imagePropertyDetection']);
+    Route::post('face-detection', [CloudVisionController::class, 'faceDetection'])->middleware('auth:sanctum');
+    Route::post('label-detection', [CloudVisionController::class, 'labelDetection'])->middleware('auth:sanctum');
+    Route::post('safe-search-detection', [CloudVisionController::class, 'safeSearchDetection'])->middleware('auth:sanctum');
+    Route::post('logo-detection', [CloudVisionController::class, 'logoDetection'])->middleware('auth:sanctum');
+    Route::post('image-property-detection', [CloudVisionController::class, 'imagePropertyDetection'])->middleware('auth:sanctum');
+    Route::post('text-detection', [CloudVisionController::class, 'textDetection'])->middleware('auth:sanctum');
+    Route::post('landmark-detection', [CloudVisionController::class, 'landmarkDetection'])->middleware('auth:sanctum');
     
 });
+
+
+Route::post('speech-to-text', [speechController::class, 'speechAi'])->middleware('auth:sanctum');

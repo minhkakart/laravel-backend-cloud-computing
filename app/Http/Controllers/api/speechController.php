@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Activity;
 use Google\Cloud\Speech\V1\RecognitionAudio;
 use Google\Cloud\Speech\V1\RecognitionConfig;
 use Google\Cloud\Speech\V1\SpeechClient;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class speechController extends Controller
 {
@@ -14,17 +16,13 @@ class speechController extends Controller
     {
         $audioFile = $request->input('gcs_uri');
 
-        $speechClient = new SpeechClient();
-        //dịch 1 đoạn nhạc thành text
-
         // Khởi tạo SpeechClient
+        $speechClient = new SpeechClient([
+            'key' => env('GOOGLE_CLOUD_TRANSLATE_API_KEY')
+        ]);
 
-        // Đọc dữ liệu từ file audio
-
-        // $audio = (new RecognitionAudio())
-        //     ->setContent(file_get_contents($audioFile));
-        $audio = (new RecognitionAudio())
-            ->setUri($audioFile);
+        // Tạo một đối tượng RecognitionAudio từ file audio
+        $audio = new RecognitionAudio(['uri' => $audioFile]);
 
         // Thiết lập các thông số cho quá trình nhận dạng
         $config = (new RecognitionConfig())
@@ -33,24 +31,36 @@ class speechController extends Controller
             ->setLanguageCode('en-US');
 
         // Gửi yêu cầu nhận dạng
-        $response = $speechClient->recognize($config, $audio);
+        $response = $speechClient->longRunningRecognize($config, $audio);
+        $response->pollUntilComplete();
         $results = [];
         $ketqua = [];
-        // dd($response);
-        // Lặp qua các kết quả nhận dạng
-        foreach ($response->getResults() as $result) {
-            // $transcript = $result->getAlternatives()[0]->getTranscript();
-            // $results[] = $result->getAlternatives()[0]->getTranscript();
-            $results = $result->getAlternatives();
 
-            foreach ($results as $re) {
-                $ketqua[] = $re->getTranscript();
+        if ($response->operationSucceeded()) {
+            // dd($response->getResult());
+            // Lặp qua các kết quả nhận dạng
+            foreach ($response->getResult()->getResults() as $result) {
+                $results = $result->getAlternatives();
+                foreach ($results as $re) {
+                    $ketqua[] = $re->getTranscript();
+                }
+                // echo 'Text: ' . $transcript . PHP_EOL;
             }
-            // echo 'Text: ' . $transcript . PHP_EOL;
-        }
 
-        // Đóng SpeechClient
-        $speechClient->close();
-        return response()->json(['speechdetect' => $ketqua]);
+            $user_id = Auth::id();
+            $user_activities = Activity::firstOrNew([
+                'user_id' => $user_id,
+                'api' => 'speech_to_text'
+            ], [
+                'count' => 0
+            ]);
+            $user_activities->save();
+            $user_activities->increment('count');
+
+            return response()->json(['speechdetect' => $ketqua]);
+        } else {
+            $error = $response->getError();
+            return response()->json(['error' => $error])->setStatusCode(500);
+        }
     }
 }

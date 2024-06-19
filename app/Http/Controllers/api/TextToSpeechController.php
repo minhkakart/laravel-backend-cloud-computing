@@ -40,14 +40,14 @@ class TextToSpeechController extends Controller
         $client->close();
 
         $user_id = Auth::id();
-            $user_activities = Activity::firstOrNew([
-                'user_id' => $user_id,
-                'api' => 'text_to_speech'
-            ], [
-                'count' => 0
-            ]);
-            $user_activities->save();
-            $user_activities->increment('count');
+        $user_activities = Activity::firstOrNew([
+            'user_id' => $user_id,
+            'api' => 'text_to_speech'
+        ], [
+            'count' => 0
+        ]);
+        $user_activities->save();
+        $user_activities->increment('count');
 
         return response()->json([
             'audioContent' => base64_encode($audioContent),
